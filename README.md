@@ -14,7 +14,7 @@ iOS framework shims over [vitaGL](https://github.com/Rinnegatamante/vitagl).
 > copy** of the iOS game. Read [`LEGAL.md`](LEGAL.md) before installing or
 > redistributing.
 
-**Repository:** <https://github.com/lferrete/redeg-vita>
+**Repository:** <https://github.com/lferrete/redeg-vita><br>
 **Release:** <https://github.com/lferrete/redeg-vita/releases/latest>
 
 ---
