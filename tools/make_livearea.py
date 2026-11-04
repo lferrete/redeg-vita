@@ -44,11 +44,11 @@ def gradient(w, h, top=(22, 6, 7), bottom=(3, 2, 3)):
     return img
 
 
-def cover(img, w, h):
+def cover(img, w, h, top_frac=0.5):
     scale = max(w / img.width, h / img.height)
     resized = img.resize((max(1, int(img.width * scale)), max(1, int(img.height * scale))), Image.Resampling.LANCZOS)
     x = (resized.width - w) // 2
-    y = (resized.height - h) // 2
+    y = int((resized.height - h) * top_frac)
     return resized.crop((x, y, x + w, y + h))
 
 
@@ -81,45 +81,63 @@ def make_icon(src):
     save_indexed(im, LIVE / "icon0.png")
 
 
+def add_caption(base, title_size, sub_size, x, y):
+    d = ImageDraw.Draw(base)
+    try:
+        title_font = ImageFont.truetype(FONT_BOLD, title_size)
+        sub_font = ImageFont.truetype(FONT_BOLD, sub_size)
+        small_font = ImageFont.truetype(FONT_REGULAR, max(10, sub_size // 2))
+    except OSError:
+        title_font = sub_font = small_font = ImageFont.load_default()
+
+    d.text((x + 2, y + 2), "RESIDENT EVIL", font=title_font,
+           fill=(0, 0, 0), stroke_width=2, stroke_fill=(0, 0, 0))
+    d.text((x, y), "RESIDENT EVIL", font=title_font,
+           fill=(240, 232, 224), stroke_width=2, stroke_fill=(10, 4, 4))
+    d.text((x + 1, y + int(title_size * 0.82)), "DEGENERATION", font=sub_font,
+           fill=(200, 176, 172), stroke_width=1, stroke_fill=(10, 4, 4))
+    line_y = y + int(title_size * 1.48)
+    d.line([(x + 2, line_y), (x + int(title_size * 4.2), line_y)],
+           fill=(160, 28, 24), width=max(2, title_size // 22))
+    d.text((x + 2, line_y + max(6, sub_size // 3)), "PS VITA",
+           font=small_font, fill=(180, 170, 165))
+
+
 def make_pic0(src):
     w, h = 960, 544
-    base = gradient(w, h).convert("RGBA")
-    base = Image.alpha_composite(base, red_glow((w, h)))
+    # Full-bleed 16:9 crop from the top of the key art (faces, not the logo).
+    base = cover(src, w, h, 0.0).convert("RGBA")
+    base = ImageEnhance.Brightness(base).enhance(0.86)
+    base = ImageEnhance.Contrast(base).enhance(1.04)
 
-    # A dark, blurred copy fills the frame without competing with the key art.
-    backdrop = cover(src, w, h).filter(ImageFilter.GaussianBlur(26))
-    backdrop = ImageEnhance.Brightness(backdrop).enhance(0.30)
-    base = Image.alpha_composite(base, backdrop.convert("RGBA"))
+    shade = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shade)
+    for y in range(h):
+        a = int(155 * max(0, (y - int(h * 0.55)) / max(1, h - int(h * 0.55))))
+        sd.line([(0, y), (w, y)], fill=(0, 0, 0, a))
+    base = Image.alpha_composite(base, shade)
+    base = vignette(base.convert("RGB"), 0.35).convert("RGBA")
 
-    art = src.resize((500, 500), Image.Resampling.LANCZOS)
-    art = ImageEnhance.Contrast(art).enhance(1.03)
-    base.paste(art, (230, 18))
-
-    base = vignette(base.convert("RGB"), 0.42).convert("RGBA")
-    d = ImageDraw.Draw(base)
-    d.line([(230, 526), (730, 526)], fill=(150, 22, 20, 220), width=2)
-    try:
-        font = ImageFont.truetype(FONT_BOLD, 15)
-    except OSError:
-        font = ImageFont.load_default()
-    d.text((230, 533), "PS VITA", font=font, fill=(180, 170, 165))
+    add_caption(base, 54, 24, 48, 365)
     save_indexed(base, LIVE / "pic0.png")
 
 
 def make_bg0(src):
     w, h = 840, 500
-    base = gradient(w, h).convert("RGBA")
-    base = Image.alpha_composite(base, red_glow((w, h)))
+    # Full-bleed crop for the gate background, no square/4:3 centre image.
+    base = cover(src, w, h, 0.0).convert("RGBA")
+    base = ImageEnhance.Brightness(base).enhance(0.86)
+    base = ImageEnhance.Contrast(base).enhance(1.04)
 
-    backdrop = cover(src, w, h).filter(ImageFilter.GaussianBlur(26))
-    backdrop = ImageEnhance.Brightness(backdrop).enhance(0.30)
-    base = Image.alpha_composite(base, backdrop.convert("RGBA"))
+    shade = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shade)
+    for y in range(h):
+        a = int(155 * max(0, (y - int(h * 0.55)) / max(1, h - int(h * 0.55))))
+        sd.line([(0, y), (w, y)], fill=(0, 0, 0, a))
+    base = Image.alpha_composite(base, shade)
+    base = vignette(base.convert("RGB"), 0.35).convert("RGBA")
 
-    art = src.resize((500, 500), Image.Resampling.LANCZOS)
-    art = ImageEnhance.Contrast(art).enhance(1.03)
-    base.paste(art, (170, 0))
-
-    base = vignette(base.convert("RGB"), 0.42)
+    add_caption(base, 46, 21, 40, 326)
     save_indexed(base, LIVE / "bg0.png")
 
 
