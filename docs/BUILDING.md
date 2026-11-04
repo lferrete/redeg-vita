@@ -100,6 +100,32 @@ py -3 tools\make_livearea.py
 artwork; review the image diff before committing. The source artwork is
 ignored by git.
 
+### Art rules (do not repeat the Bruce Lee mistake)
+
+This project originally inherited `extras/livearea/` and
+`extras/livearea_personal/` from a previous port, so the Vita bubble showed
+Bruce Lee. A second issue was a **blank white bubble**: the icon was saved as
+32-bit RGBA, while the LiveArea expects an **8-bit indexed PNG (`P`)**.
+
+- Generate all art from **this game's** `iTunesArtwork`/`Icon.png`.
+- Delete or ignore `extras/livearea_personal/`, stale `source_icon.*` and
+  old `loading*.rgb565` before building.
+- Use `icon0` 128×128, `pic0` 960×544 and `bg0` 840×500 **full-bleed**
+  (cover crop, not a square 1:1 image centred on a gradient), and `startup`
+  280×158 (16:9). Do not letterbox the key art; it reads as 4:3 with bars.
+- Save all four as 8-bit indexed PNG (`P` mode), 256 colours.
+- Check the sizes/modes before building:
+
+```powershell
+py -3 -c "from PIL import Image; [print(n, Image.open('extras/livearea/'+n).size, Image.open('extras/livearea/'+n).mode) for n in ['icon0.png','pic0.png','bg0.png','startup.png']]"
+```
+
+When replacing art manually on the console, update
+`ux0:/app/REDEGEN01/sce_sys`, `ux0:/appmeta/REDEGEN01` and
+`ur0:/appmeta/REDEGEN01` (if present), then reboot. The LiveArea icon path in
+`ur0:/shell/db/app.db` may point at `ur0:appmeta/REDEGEN01/icon0.png`, not
+`ux0:`. If the bubble is blank, check the PNG mode first.
+
 ## 5. Local game data for testing
 
 Use your own decrypted IPA:

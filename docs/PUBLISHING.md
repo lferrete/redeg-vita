@@ -38,6 +38,11 @@ This project also:
       `.icf`, `.nib`, `.mp4`, save, log or game data.
 - [ ] The only game-derived files are the LiveArea art under
       `extras/livearea/`; they are documented in `LEGAL.md`.
+- [ ] The art was generated from **this game's** `iTunesArtwork`, not copied
+      from another port; `extras/livearea_personal/` and old
+      `loading*.rgb565` are absent.
+- [ ] `icon0/pic0/bg0/startup` are 8-bit indexed PNG (`P`), with `pic0`
+      960×544 and `bg0` 840×500 **full-bleed**, and `startup` 280×158 (16:9).
 - [ ] `extras/livearea/source_*`, `extras/livearea_personal/` and
       `extras/loading*.rgb565` are ignored.
 - [ ] `build/`, `data/`, logs and the IPA are ignored.
