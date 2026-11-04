@@ -1,0 +1,74 @@
+# ---------------------------------------------------------------------------
+# NEVER commit game data, saves, logs, extracted IPAs or the IPA itself.
+# ---------------------------------------------------------------------------
+data/
+game/
+Documents/
+tmp/
+tmp_save/
+logs/
+*.log
+*.ipa
+*.app/
+*.dz
+*.icf
+*.nib
+*.mp4
+*.plist
+*.pkg
+*.pup
+
+# Game executable and iOS metadata copied out of the IPA.
+residentevil
+PkgInfo
+Default.png
+Icon.png
+iTunesArtwork
+iTunesMetadata.plist
+
+# The LiveArea source artwork is extracted from the user's own IPA. The
+# committed LiveArea art lives in extras/livearea/.
+extras/livearea/source_*
+extras/livearea_personal/
+extras/loading*.rgb565
+extras/cpuinfo
+extras/meminfo
+extras/scripts/
+
+# Internal reverse-engineering notes and scratch tools are not published.
+docs/PORT-LOG.md
+docs/PORT-STATUS.md
+docs/REVERSE-ENGINEERING.md
+tools/emu/
+tools/dz_extract.py
+tools/find_calls.py
+tools/macho_sections.py
+tools/macho_syms.py
+tools/sync_port_skill.ps1
+extract_console/
+scratch/
+.opencode/
+
+# Build outputs and generated binaries.
+build/
+build_test/
+*.vpk
+*.velf
+*.self
+*.elf
+*.o
+*.obj
+*.a
+*.psp2dmp
+param.sfo
+SHA256SUMS.txt
+
+# Python / editors / OS.
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+tai_config.txt
