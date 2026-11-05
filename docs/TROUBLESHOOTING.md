@@ -37,6 +37,13 @@ chdir(ux0:data/redeg/game) failed
 - Check that the game data is at `ux0:data/redeg/game/`, not
   `ux0:data/redeg/residentevil.app/` or `ux0:data/redeg/game/residentevil.app/`.
 
+### Stretched triangles / exploding animated meshes
+
+Use port version **1.0.1** or newer and check its version in the new run's
+log. The loader in 1.0 could rebase a numeric sine-table entry as a pointer,
+which broke skeletal animation. Reinstalling textures does not repair that
+executable. See the [investigation](GRAPHICS-INVESTIGATION-2026-11-05.md).
+
 ## 4. No audio
 
 1. Check the PS Vita volume and mute state.

@@ -29,10 +29,10 @@ if (-not (Test-Path -LiteralPath $eboot)) {
 $sfo = Join-Path $BuildDir "param.sfo"
 & (Join-Path $vitasdk "bin\vita-mksfoex.exe") `
     -d "ATTRIBUTE2=12" `
-    -s "APP_VER=01.00" `
+    -s "APP_VER=01.01" `
     -s "TITLE_ID=REDEGEN01" `
     -s "PORT_AUTHOR=Leandro Ferrete" `
-    -s "PORT_VERSION=1.0" `
+    -s "PORT_VERSION=1.0.1" `
     "Resident Evil: Degeneration" `
     $sfo
 

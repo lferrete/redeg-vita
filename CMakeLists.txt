@@ -16,7 +16,7 @@ include("${VITASDK}/share/vita.cmake" REQUIRED)
 set(VITA_APP_NAME "Resident Evil: Degeneration")
 set(VITA_TITLEID "REDEGEN01")
 set(VITA_VPKNAME "redeg")
-set(VITA_VERSION "01.00")
+set(VITA_VERSION "01.01")
 set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
 
 set(DATA_PATH "ux0:data/redeg/" CACHE STRING "Path to data (with trailing /)")

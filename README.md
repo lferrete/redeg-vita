@@ -24,7 +24,10 @@ iOS framework shims over [vitaGL](https://github.com/Rinnegatamante/vitagl).
 - Tested with the iOS version **1.03.00** (IPA
   `Resident_Evil__Degeneration_1.03.00_ios_2.2.1.ipa`, bundle
   `jp.co.capcom.residentevil.en`, ARMv6 softfp, `cryptid = 0`).
-- Native **960×544** landscape rendering through vitaGL at **60 FPS**, with
+- **1.0.1 fixes stretched triangles in skeletal animation** by preserving
+  numeric IwMath tables during Mach-O rebasing. See the
+  [investigation and validation](docs/GRAPHICS-INVESTIGATION-2026-11-05.md).
+- Native **960×544** landscape rendering through vitaGL, with
   the original `480×320` GLES1 framebuffer scaled to full screen.
 - Audio through the original `AudioQueue` API translated to
   `sceAudioOut`: 16 kHz mono PCM with digital gain.

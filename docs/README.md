@@ -9,6 +9,9 @@ Documentation for players, developers and repository maintenance.
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Black screen, missing data, audio, input, saves and logs. |
 | [AUTHORSHIP.md](AUTHORSHIP.md) | Authorship, credits and verification. |
 | [PUBLISHING.md](PUBLISHING.md) | Safe publishing, repository settings and releases. |
+| [GRAPHICS-INVESTIGATION-2026-11-05.md](GRAPHICS-INVESTIGATION-2026-11-05.md) | Mesh corruption: cause, experiments, hardware evidence and reproducible regression. |
+| [PORT-STATUS.md](PORT-STATUS.md) | Current validation status and clearly marked historical claims. |
+| [PORT-LOG.md](PORT-LOG.md) | Port history and links to the detailed investigation. |
 
 Root documents:
 
@@ -18,6 +21,7 @@ Root documents:
 - [AUTHORS.md](../AUTHORS.md) — port / original game / third parties.
 - [LICENSE](../LICENSE) — MIT license for the port code.
 
-> Internal reverse-engineering notes (offset maps, port log, status and
-> scratch tools) are **not part of the repository**; they stay in
-> `.gitignore` and only on the author's machine.
+The reusable porting skill is versioned under
+[`skills/android-to-vita-port`](../skills/android-to-vita-port/SKILL.md).
+`tools/sync_port_skill.ps1` copies it to the active local skill and OpenCode
+directories. Raw logs, dumps, game data and private scratch inputs remain ignored.

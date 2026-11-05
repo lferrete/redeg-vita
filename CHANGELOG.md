@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.0.1 — 2026-11-05 — Skeletal mesh corruption
+
+- Preserve the numeric IwMath sine/atan lookup tables during Mach-O rebasing.
+  A packed pair of sine values was mistaken for a pointer, corrupting
+  quaternion interpolation and producing stretched triangles during animation.
+- Restore native IwAnim skinning and matrix updates; remove the unsuccessful
+  32-bit skinning workaround and per-triangle diagnostic scans.
+- Preserve seven additional verified numeric constants in literal pools.
+- Add opt-in pre-entry image capture and a regression tool that replays the
+  original ARM sine/cosine routines for all 8,192 function/angle combinations.
+- Record experiments and evidence in
+  [the graphics investigation](docs/GRAPHICS-INVESTIGATION-2026-11-05.md).
+
 ## v1.0 — 2026-11-04 — First release
 
 - First public release of the PS Vita port (`REDEGEN01`), verified end-to-end

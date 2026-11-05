@@ -35,16 +35,14 @@ extras/cpuinfo
 extras/meminfo
 extras/scripts/
 
-# Internal reverse-engineering notes and scratch tools are not published.
-docs/PORT-LOG.md
-docs/PORT-STATUS.md
+# Private reverse-engineering inputs and scratch tools are not published.
+# Port history, current status and reusable skills are versioned documentation.
 docs/REVERSE-ENGINEERING.md
 tools/emu/
 tools/dz_extract.py
 tools/find_calls.py
 tools/macho_sections.py
 tools/macho_syms.py
-tools/sync_port_skill.ps1
 extract_console/
 scratch/
 .opencode/

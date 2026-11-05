@@ -495,17 +495,8 @@ int main(int argc, char **argv) {
     macho_add_patch(0x0ba220, 0x462246C0); /* IwGx glNormalPointer wrapper: nop pointer-equality skip */
     macho_add_patch(0x0ba23c, 0x462346C0); /* IwGx glVertexPointer wrapper: nop pointer-equality skip */
     macho_add_patch(0x0ba25c, 0x46C042A3); /* IwGx glTexCoordPointer wrapper: nop pointer-equality skip */
-    /* Force IwGx Model-View matrix updater (0x000674fc) to always run full matrix update (0x67640)
-     * instead of taking the translation-only fast path (0x67520..0x6763c) which leaves the 1.22
-     * fixed-point view-model matrix translation at [IwGxState + 0x198..0x1a0] stale. */
-    macho_add_patch(0x06751c, 0xEA000047); /* IwGx MV matrix update @ 0x0006751c: b 0x67640 */
-    /* Replace IwAnimSkin_Offset (0x0006c43c) with 32-bit fixed-point skinning implementation
-     * so per-bone positions and weighted sums exceeding int16_t [-32768, +32767] do not wrap around. */
-    {
-        extern int redeg_IwAnimSkin_Offset(uint8_t *model, uint8_t *block);
-        macho_add_patch(0x06c43c, 0xE51FF004); /* ldr pc, [pc, #-4] */
-        macho_add_patch(0x06c440, (uint32_t)(uintptr_t)redeg_IwAnimSkin_Offset);
-    }
+    /* Preserve native matrix updates and 16-bit IwAnim skinning. The
+     * mesh explosion came from rebasing the numeric sine table. */
 
     macho_image_t img;
     if (macho_load(DATA_PATH "game/residentevil", &img) < 0) {
@@ -516,6 +507,19 @@ int main(int argc, char **argv) {
     finish_hooks(img.delta);
     finish_entry_hooks(img.delta);
     finalize_hooks();
+
+    /* Opt-in loader evidence, captured before the guest mutates its image. */
+    FILE *graphics_probe = fopen(DATA_PATH "graphics_probe", "rb");
+    if (graphics_probe) {
+        fclose(graphics_probe);
+        FILE *dump = fopen(DATA_PATH "logs/loaded-image.bin", "wb");
+        if (dump) {
+            size_t n = fwrite((const void *)(uintptr_t)img.load_base, 1, img.image_size, dump);
+            fclose(dump);
+            l_info("[graphics-probe] loaded image base=%08x delta=%08x bytes=%u/%u",
+                   img.load_base, img.delta, (unsigned)n, img.image_size);
+        }
+    }
 
     /* Diagnostic: keep the whole image RWX. Some Marmalade runtime paths
      * write temporary data into __TEXT-adjacent pages; RX there showed up

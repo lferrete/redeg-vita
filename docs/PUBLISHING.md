@@ -24,8 +24,9 @@ This project also:
 - Uses LiveArea artwork derived from the original game (icon, background,
   startup and profile images). It is included only to identify the unofficial
   port; all rights remain with the original owners.
-- Does not include internal reverse-engineering notes (offset maps, port log,
-  status) — they are in `.gitignore`.
+- Includes the maintained port history/status, graphics investigation and
+  reusable text/source-only porting skill. Raw logs, dumps, game inputs and
+  private scratch work remain in `.gitignore`.
 - Ships a VPK with `eboot.bin`, `sce_sys/` and `provenance.txt`, but **no**
   `residentevil`, `main.dz`, `.icf`, `.nib`, `intro.mp4`, textures, audio,
   saves or other game data.

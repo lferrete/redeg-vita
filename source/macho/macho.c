@@ -251,6 +251,23 @@ static uint32_t *s_arm_lits = NULL;
 static uint32_t s_n_arm_lits = 0;
 static uint32_t s_cap_arm_lits = 0;
 
+/* Numeric pools in this exact IPA, verified from their LDR consumers.
+ * 0x3ffff is a bound/mask, and 0x2000 is ORR/BIC'd into a flag word.
+ * An odd value inside the code range is insufficient evidence of a pointer. */
+static int is_numeric_literal(uint32_t vm) {
+    static const struct { uint32_t vm, value; } literals[] = {
+        {0x03c274, 0x3ffff}, {0x03cb80, 0x3ffff},
+        {0x0938e4, 0x2000}, {0x098ca8, 0x3ffff},
+        {0x0c47c8, 0x3ffff}, {0x0ed9ec, 0x3ffff},
+        {0x100868, 0x3ffff},
+    };
+    for (unsigned i = 0; i < sizeof(literals) / sizeof(literals[0]); i++)
+        if (vm == literals[i].vm &&
+            *(const uint32_t *)(s_file + vm - 0x1000) == literals[i].value)
+            return 1;
+    return 0;
+}
+
 static void arm_lit_push(uint32_t v) {
     if (s_n_arm_lits == s_cap_arm_lits) {
         uint32_t cap = s_cap_arm_lits ? s_cap_arm_lits * 2 : 4096;
@@ -299,7 +316,7 @@ static void rebase_literals(void) {
                 if ((w & 0x0FFF0FF0) == 0x012FFF10) break;   /* bx */
             }
             if (is_pic) continue;
-            if (target >= start && target < end && !(target >= 0x113140 && target < 0x1300b0)) {
+            if (target >= start && target < end && !is_numeric_literal(target) && !(target >= 0x113140 && target < 0x1300b0)) {
                 uint32_t *lit = (uint32_t *)(g_macho.load_base + (target - 0x1000));
                 uint32_t v = *lit;
                 if (is_pointer_value(v)) { *lit = v + g_macho.delta; n++; }
@@ -322,6 +339,7 @@ static void rebase_literals(void) {
         if ((h & 0xF800) == 0x4800) {
             uint32_t target = ((a + 4) & ~3u) + ((uint32_t)(h & 0xFF) << 2);
             if (target < start || target + 4 > end) continue;
+            if (is_numeric_literal(target)) continue;
             if (target >= 0x113140 && target < 0x1300b0) continue;
             if (arm_lit_has(target)) continue;
             uint32_t rt = (h >> 8) & 7;
@@ -423,11 +441,20 @@ static void rebase_section_all(section_t *s, const char *tag) {
     if (n) l_info("rebased %u words in %s (all)", n, tag);
 }
 
-static void build_objc_skip_ranges(void) {
+static void build_data_skip_ranges(void) {
     s_nskip = 0;
     /* _g_s3e_data 96-byte XE3U module header and packed byte constant table */
     add_skip(0x234400, 0x234460);
     add_skip(0x235c38, 0x235cd8);
+    /* IwMath's uint16_t sine quarter-wave (1025 entries + alignment),
+     * followed by the 513-entry int32_t atan table. Neither contains
+     * pointers. In particular, sine[2:4] packs as 0x0012000c and the
+     * generic pointer heuristic mistakes it for an address in .rodata.
+     * Rebasing it makes sin(2/3) return 61452/38929 instead of 12/18,
+     * causing quaternion slerp to explode before geometry reaches GL. */
+    add_skip(0x235e9c, 0x2366a0);
+    add_skip(0x2366a0, 0x236ea4);
+    l_info("[graphics] preserving IwMath sine/atan numeric tables");
     section_t *cl = find_section("__DATA", "__objc_classlist");
     if (!cl) return;
     for (uint32_t i = 0; i < cl->size / 4; i++) {
@@ -441,7 +468,7 @@ static void build_objc_skip_ranges(void) {
         uint32_t ro = file_u32(cls + 16);
         if (ro >= 0x1000 && ro < s_max_vm) { add_skip(ro, ro + 12); collect_ivars(ro); }
     }
-    l_info("objc skip ranges: %d", s_nskip);
+    l_info("data rebase skip ranges: %d", s_nskip);
 }
 
 /* ---------------- symbols ---------------- */
@@ -630,7 +657,7 @@ int macho_load(const char *path, macho_image_t *out) {
     rebase_stubs();
 
     /* pointer sections */
-    build_objc_skip_ranges();
+    build_data_skip_ranges();
     s_skip_active = 1;
     rebase_section(find_section("__DATA", "__data"), "__data");
     s_skip_active = 0;

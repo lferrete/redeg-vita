@@ -164,5 +164,39 @@ extras/livearea/   tracked LiveArea art + template
 docs/              player and developer documentation
 ```
 
-Internal reverse-engineering notes (offset maps, port log, status) are
-**not** part of the public repository and are listed in `.gitignore`.
+Port history, status, the graphics investigation and reusable skill are
+versioned. Raw game inputs, logs, dumps and private scratch work remain ignored.
+
+## 8. Graphics regression
+
+`tools/verify_iwmath.py` needs Python 3 + Unicorn and the exact supported
+Mach-O identified by SHA-256. It replays the original ARM sine/cosine
+routines against an opt-in hardware image dump, testing all 8,192
+function/angle combinations. See
+[the investigation](GRAPHICS-INVESTIGATION-2026-11-05.md) for commands,
+dump capture and expected failing/passing evidence. Game code and dumps
+remain in ignored local directories; never include them in a VPK.
+
+The hardware dump is enabled only when `ux0:data/redeg/graphics_probe`
+exists. Remove that flag after collecting evidence to avoid a 7.2 MB write
+at each boot.
+
+## 9. Reusable porting knowledge
+
+The complete text/source-only skill is included in
+`skills/android-to-vita-port/`. Its entrypoint routes this iOS/Mach-O port to
+reference 17; the Android and other-port references provide reusable context.
+The snapshot uses `<VITA_IP>` in place of private device addresses; discover
+the current address with Vita MCP before applying examples.
+
+To refresh its Resident Evil case study from the investigation and copy the
+versioned skill into local discovery directories:
+
+```powershell
+./tools/sync_port_skill.ps1
+```
+
+The script merges files into `~/.agents/skills`, the global OpenCode directory
+and the workspace OpenCode directory. Explicit `-Source`, `-ActiveDest`,
+`-GlobalDest` and `-RootDest` parameters support isolated verification. It
+preserves unrelated destination files.
